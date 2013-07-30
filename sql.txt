@@ -1,0 +1,95 @@
+SELECT
+			spb.id as supplierProductId,
+			spb.ProductsName as supplierProductName,
+			(case when trim(ifnull(spb.customId,''))='' then p.customId else spb.customId end) as customId,
+			spb.ProductsId as productId,
+			p.cid as cid,
+			spb.suppliersId as supplierId,
+			spb.CategoriesId as categoryId,
+			pcl.category_name as categoryName,
+			spb.ProductsPrice as productPrice,
+			spb.first_picture_url as firstPictureUrl,
+			spb.ProductsActivator as isChecked,
+			spb.check_offline_status as checkOfflineStatus,
+			spb.pro_url as proUrl
+		FROM
+			suppliers_products_backup spb
+		JOIN products_categories_lang pcl 
+		ON spb.CategoriesId = pcl.products_categorie_id
+		LEFT JOIN products p 
+		ON spb.productsId = p.id
+		where 1=1
+		and
+			spb.suppliersId IN (151)
+		and
+			spb.productsId is not null
+			and 
+			exists(
+				SELECT a.*
+				FROM
+					products_lang a,
+					`language` b,
+					products_ref_suppliers c
+				WHERE
+					a.ProductsId = spb.ProductsId AND a.websiteid = 1
+				AND b.language_abbreviation NOT IN('zh-cn', 'zh-hk', 'cn-cn')
+				AND b.data_status = 0
+				AND a.language_id = b.language_id
+				AND a.ProductsActivator = 1 
+				AND a.data_status = 0
+				AND a.ProductsId = c.products_id
+				AND c.suppliersId = spb.suppliersId
+			)
+			and spb.data_status = 0
+		and pcl.language_id = 1
+		and pcl.data_status = 0
+		
+		
+		
+
+SELECT
+			spb.id as supplierProductId,
+			spb.ProductsName as supplierProductName,
+			(case when trim(ifnull(spb.customId,''))='' then p.customId else spb.customId end) as customId,
+			spb.ProductsId as productId,
+			p.cid as cid,
+			spb.suppliersId as supplierId,
+			spb.CategoriesId as categoryId,
+			pcl.category_name as categoryName,
+			spb.ProductsPrice as productPrice,
+			spb.first_picture_url as firstPictureUrl,
+			spb.ProductsActivator as isChecked,
+			spb.check_offline_status as checkOfflineStatus,
+			spb.pro_url as proUrl
+		FROM
+			suppliers_products_backup spb
+		JOIN products_categories_lang pcl 
+		ON spb.CategoriesId = pcl.products_categorie_id
+		LEFT JOIN products p 
+		ON spb.productsId = p.id
+		where 1=1
+		and
+			spb.suppliersId IN (151)
+		AND (
+				spb.productsId is null
+				or 
+				spb.productsId not in (
+					SELECT a.ProductsId
+					FROM
+						products_lang a,
+						`language` b,
+						products_ref_suppliers c
+					WHERE
+						a.ProductsId = spb.ProductsId AND a.websiteid = 1
+					AND b.language_abbreviation NOT IN('zh-cn', 'zh-hk', 'cn-cn')
+					AND b.data_status = 0
+					AND a.language_id = b.language_id
+					AND a.ProductsActivator = 1 
+					AND a.data_status = 0
+					AND a.ProductsId = c.products_id
+					AND c.suppliersId = spb.suppliersId
+				)
+			)
+			and spb.data_status = 0
+		and pcl.language_id = 1
+		and pcl.data_status = 0
